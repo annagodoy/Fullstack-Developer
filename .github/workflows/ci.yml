@@ -107,7 +107,7 @@ jobs:
           for attempt in {1..60}; do
             status=$(curl --silent --output /dev/null \
               --write-out '%{http_code}' --max-time 2 \
-              http://localhost/up) || status=000
+              http://localhost:8080/up) || status=000
 
             if [ "$status" = "200" ]; then
               echo "Production container is healthy."
