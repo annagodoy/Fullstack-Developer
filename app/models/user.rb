@@ -12,4 +12,6 @@ class User < ApplicationRecord
   validates :password,
     length: { minimum: 12 },
     allow_nil: true
+
+  enum :role, { member: 0, admin: 1 }, validate: true
 end

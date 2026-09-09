@@ -50,4 +50,29 @@ class UserTest < ActiveSupport::TestCase
     assert user.update(email: "new-email@example.com")
     assert_equal current_password_digest, user.reload.password_digest
   end
+
+  test "new users default to member" do
+    user = User.create!(
+      email: "member@example.com",
+      password: "test-password"
+    )
+
+    assert user.reload.member?
+    assert_not user.admin?
+  end
+
+  test "persists the admin role" do
+    user = users(:one)
+    user.update!(role: :admin)
+
+    assert user.reload.admin?
+  end
+
+  test "rejects an invalid role" do
+    user = users(:one)
+    user.role = "invalid"
+
+    assert_not user.valid?
+    assert user.errors.added?(:role, :inclusion, value: "invalid")
+  end
 end
