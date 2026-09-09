@@ -1,0 +1,9 @@
+<div class="space-y-4">
+    <h1 class="text-2xl font-bold">Welcome</h1>
+    <p>Signed in as <%= Current.user.email %></p>
+    <%= button_to "Sign out",
+        session_path,
+        method: :delete,
+        class: "rounded bg-indigo-600 px-4 py-2 text-white"
+    %>
+</div>
