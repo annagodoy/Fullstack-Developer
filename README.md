@@ -13,11 +13,15 @@ The technical challenge is described in [CHALLENGE.md](CHALLENGE.md).
 
 ## Current status
 
-Initial setup and native Rails authentication are implemented,
-including sign-in, sign-out, and password reset.
+Initial setup, native Rails authentication, user roles and
+administrative access restrictions are implemented.
 
-Registration, user roles, profiles, and administrative features
-have not been implemented yet.
+Admins are redirected to a dashboard after sign-in.
+Members currently land on the protected home page and cannot access
+admin pages.
+
+Registration, profile management, admin users management,
+dashboard counters, and spreadsheet imports are not implemented yet.
 
 ## Stack
 
