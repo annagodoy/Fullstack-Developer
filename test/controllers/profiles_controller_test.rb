@@ -112,4 +112,37 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select "[role='alert']", /Full name/
   end
+
+  test "visitors cant delete profiles" do
+    assert_no_difference -> { User.count } do
+      delete profile_path
+    end
+
+    assert_redirected_to new_session_path
+  end
+
+  test "deletes the current user profile and the session" do
+    user  = users(:one)
+    user2 = users(:two)
+
+    sign_in_as(user)
+
+    user.sessions.create!
+
+    assert_no_changes -> { user2.reload.attributes } do
+      assert_difference "User.count", -1 do
+        delete profile_path, params: {
+          id: user2.id
+        }
+      end
+    end
+
+    assert_redirected_to new_session_path
+    assert_not User.exists?(user.id)
+    assert_not Session.exists?(user_id: user.id)
+    assert_empty cookies[:session_id]
+
+    get profile_path
+    assert_redirected_to new_session_path
+  end
 end

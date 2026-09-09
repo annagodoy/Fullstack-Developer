@@ -24,6 +24,15 @@
 
   <%= link_to "Edit profile", edit_profile_path, class: "underline" %>
 
+  <%= button_to "Delete profile", profile_path,
+    method: :delete, form: {
+      data: {
+        turbo_confirm: "Are you sure? This cant be undone."
+      }
+    },
+    class: "rounded bg-red-700 px-4 py-2 text-white"
+  %>
+
   <%= button_to "Sign out", session_path, method: :delete,
     class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
 </div>

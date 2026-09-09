@@ -15,6 +15,18 @@ class ProfilesController < ApplicationController
     status: :see_other
   end
 
+  def destroy
+    @current_user.destroy!
+
+    cookies.delete(:session_id)
+    reset_session
+    Current.reset
+
+    redirect_to new_session_path,
+    notice: "Profile deleted.",
+    status: :see_other
+  end
+
   private
 
   def set_current_user

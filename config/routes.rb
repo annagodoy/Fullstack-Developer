@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     root "dashboard#show"
   end
 
-  resource :profile, only: %i[show edit update]
+  resource :profile, only: %i[show edit update destroy]
 
   get "up" => "rails/health#show", as: :rails_health_check
 
