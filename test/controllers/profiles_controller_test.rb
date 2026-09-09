@@ -15,6 +15,7 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "#profile-email", text: user.email
+    assert_select "#profile-full-name", text: user.full_name
   end
 
   test "ignores another user id in the request" do

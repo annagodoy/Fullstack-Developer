@@ -75,4 +75,9 @@ class UserTest < ActiveSupport::TestCase
     assert_not user.valid?
     assert user.errors.added?(:role, :inclusion, value: "invalid")
   end
+
+  test "strips full name" do
+    user = User.new(full_name: "  John Doe  ")
+    assert_equal("John Doe", user.full_name)
+  end
 end

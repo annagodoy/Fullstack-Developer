@@ -3,6 +3,12 @@
 
   <dl class="space-y-2">
     <div>
+      <dt class="font-semibold">Full name</dt>
+      <dd id="profile-full-name">
+        <%= @current_user.full_name.presence || "Not available" %>
+      </dd>
+    </div>
+    <div>
       <dt class="font-semibold">Email</dt>
       <dd id="profile-email"><%= @current_user.email %></dd>
     </div>
