@@ -27,4 +27,33 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to new_session_path
   end
+
+  test "redirect admins to dashboard after login" do
+    @user.update!(role: :admin)
+
+    get root_path
+    assert_redirected_to new_session_path
+
+    post session_path, params: {
+      email: @user.email,
+      password: "test-password"
+    }
+
+    assert_redirected_to admin_root_path
+  end
+
+  test "dont redirect members to the admin dashoboard" do
+    get admin_root_path
+    assert_redirected_to new_session_path
+
+    post session_path, params: {
+      email: @user.email,
+      password: "test-password"
+    }
+
+    assert_redirected_to root_path
+
+    get admin_root_path
+    assert_response :forbidden
+  end
 end
