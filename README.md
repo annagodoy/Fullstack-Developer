@@ -99,9 +99,8 @@ The container entrypoint prepares the production databases before
 starting the server. The CI check supplies separate connection URLs
 for the primary, queue, and cable databases.
 
-Docker validation is pending the first successful workflow run.
-The Docker health check does not verify background job execution
-or browser WebSocket delivery.
+The production Docker image was built and its `/up` endpoint
+returned HTTP 200 in GitHub Actions.
 
 ## Configuration notes
 
