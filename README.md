@@ -13,8 +13,11 @@ The technical challenge is described in [CHALLENGE.md](CHALLENGE.md).
 
 ## Current status
 
-The project is in progress. Initial setup is working.
-User-facing features have not been implemented yet.
+Initial setup and native Rails authentication are implemented,
+including sign-in, sign-out, and password reset.
+
+Registration, user roles, profiles, and administrative features
+have not been implemented yet.
 
 ## Stack
 
@@ -80,8 +83,24 @@ bin/bundler-audit
 bin/importmap audit
 ```
 
-The initial test suite contains no test cases yet. Passing an empty
-suite does not establish test coverage.
+The test suite covers authentication, password reset, session
+revocation, and user validations. Code coverage is not measured yet.
+
+## Authentication
+
+Authentication uses the Rails authentication generator and BCrypt.
+
+Email are normalized and validated. New passwords require at
+least 12 characters.
+
+Successful password resets revoke all existing database sessions
+for the user.
+
+Registration is not implemented yet. Development users can be
+created through `bin/rails console`.
+
+Password reset emails are queued through Solid Queue. SMTP delivery
+has not been configured or validated yet.
 
 ## Docker and CI
 
