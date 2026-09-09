@@ -14,5 +14,7 @@ class User < ApplicationRecord
     length: { minimum: 12 },
     allow_nil: true
 
+  validates :full_name, presence: true
+
   enum :role, { member: 0, admin: 1 }, validate: true
 end

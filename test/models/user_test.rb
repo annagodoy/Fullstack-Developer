@@ -38,7 +38,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "accepts a valid password" do
-    user = User.new(email: "new@example.com", password: "test-password")
+    user = User.new(full_name: "New Member", email: "new@example.com", password: "test-password")
 
     assert user.valid?
   end
@@ -53,6 +53,7 @@ class UserTest < ActiveSupport::TestCase
 
   test "new users default to member" do
     user = User.create!(
+      full_name: "New Member",
       email: "member@example.com",
       password: "test-password"
     )
@@ -79,5 +80,16 @@ class UserTest < ActiveSupport::TestCase
   test "strips full name" do
     user = User.new(full_name: "  John Doe  ")
     assert_equal("John Doe", user.full_name)
+  end
+
+  test "requires a full name" do
+    user = User.new(
+      full_name: "",
+      email: "new@example.com",
+      password: "test-password"
+    )
+
+    assert_not user.valid?
+    assert user.errors.added?(:full_name, :blank)
   end
 end

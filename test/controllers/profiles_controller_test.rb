@@ -96,4 +96,20 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select "[role='alert']", /Email/
   end
+
+  test "rejects a blank full name without saving changes" do
+    user = users(:one)
+    sign_in_as(user)
+
+    assert_no_changes -> { user.reload.full_name } do
+      patch profile_path, params: {
+        user: {
+          full_name: ""
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select "[role='alert']", /Full name/
+  end
 end
