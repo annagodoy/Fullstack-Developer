@@ -1,4 +1,8 @@
 <div class="space-y-4">
+  <% if notice = flash[:notice] %>
+    <p role="status"><%= notice %></p>
+  <% end %>
+
   <h1 class="text-2xl font-bold">My profile</h1>
 
   <dl class="space-y-2">
@@ -17,6 +21,8 @@
       <dd><%= @current_user.role.humanize %></dd>
     </div>
   </dl>
+
+  <%= link_to "Edit profile", edit_profile_path, class: "underline" %>
 
   <%= button_to "Sign out", session_path, method: :delete,
     class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
