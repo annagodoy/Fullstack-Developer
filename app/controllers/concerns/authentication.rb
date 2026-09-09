@@ -37,7 +37,7 @@ module Authentication
     def after_authentication_url
       session.delete(:return_to_after_authenticating)
 
-      Current.user.admin? ? admin_root_path : root_path
+      Current.user.admin? ? admin_root_path : profile_path
     end
 
     def start_new_session_for(user)

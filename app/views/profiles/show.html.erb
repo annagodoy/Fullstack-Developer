@@ -1,0 +1,17 @@
+<div class="space-y-4">
+  <h1 class="text-2xl font-bold">My profile</h1>
+
+  <dl class="space-y-2">
+    <div>
+      <dt class="font-semibold">Email</dt>
+      <dd id="profile-email"><%= @current_user.email %></dd>
+    </div>
+    <div>
+      <dt class="font-semibold">Role</dt>
+      <dd><%= @current_user.role.humanize %></dd>
+    </div>
+  </dl>
+
+  <%= button_to "Sign out", session_path, method: :delete,
+    class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
+</div>
