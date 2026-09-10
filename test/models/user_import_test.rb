@@ -56,7 +56,7 @@ class UserImportTest < ActiveSupport::TestCase
     )
 
     assert_not user_import.valid?
-    assert_includes user_import.errors[:spreadsheet], 
+    assert_includes user_import.errors[:spreadsheet],
       "must be a CSV or XLSX file"
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_201308) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_10_163325) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,6 +49,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_201308) do
     t.string "user_agent"
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "user_imports", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.integer "failed_rows", default: 0, null: false
+    t.integer "processed_rows", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.integer "total_rows", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.check_constraint "status = ANY (ARRAY[0, 1, 2, 3])", name: "user_imports_valid_status"
+    t.check_constraint "total_rows >= 0 AND processed_rows >= 0 AND failed_rows >= 0 AND failed_rows <= processed_rows AND processed_rows <= total_rows", name: "user_imports_valid_counts"
   end
 
   create_table "users", force: :cascade do |t|

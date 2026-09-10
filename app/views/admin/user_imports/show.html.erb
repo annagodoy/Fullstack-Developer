@@ -1,0 +1,39 @@
+<div class="w-full max-w-xl">
+  <h1 class="text-2xl font-bold">User import</h1>
+
+  <dl class="my-6 space-y-4">
+    <div>
+      <dt class="font-medium">File</dt>
+      <dd><%= @user_import.spreadsheet.filename %></dd>
+    </div>
+
+    <div>
+      <dt class="font-medium">Status</dt>
+      <dd id="import-status"><%= @user_import.status.humanize %></dd>
+    </div>
+
+    <div>
+      <dt class="font-medium">Processed rows</dt>
+      <dd>
+        <%= @user_import.processed_rows %> / <%= @user_import.total_rows %>
+      </dd>
+    </div>
+
+    <div>
+      <dt class="font-medium">Failed rows</dt>
+      <dd><%= @user_import.failed_rows %></dd>
+    </div>
+  </dl>
+
+  <% if @user_import.error_message.present? %>
+    <p role="alert" class="mb-4 text-red-700">
+      <%= @user_import.error_message %>
+    </p>
+  <% end %>
+
+  <%= link_to "Import another spreadsheet", new_admin_user_import_path,
+    class: "block underline" %>
+
+  <%= link_to "Back to dashboard", admin_root_path,
+    class: "mt-4 inline-block underline" %>
+</div>
