@@ -1,0 +1,51 @@
+<% if @user.errors.any? %>
+  <ul role="alert" class="rounded bg-red-50 p-4 text-red-700">
+    <% @user.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= form_with model: [:admin, @user], class: "space-y-4" do |form| %>
+
+  <div>
+    <%= form.label :full_name %>
+    <%= form.text_field :full_name, 
+      required: true,
+      class: "block w-full rounded border p-2" 
+    %>
+  </div>
+
+  <div>
+    <%= form.label :email %>
+    <%= form.email_field :email, required: true,
+      class: "block w-full rounded border p-2" 
+    %>
+  </div>
+
+  <% if @user.new_record? %>
+    <div>
+      <%= form.label :password, "Initial password" %>
+      <%= form.password_field :password, 
+        required: true, minlength: 12,
+        autocomplete: "new-password",
+        class: "block w-full rounded border p-2" 
+      %>
+
+      <p class="text-sm text-gray-600">Use at least 12 characters.</p>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :role %>
+    <%= form.select :role,
+      User.roles.keys.map { |role| [role.humanize, role] }, 
+      {},
+      class: "block w-full rounded border p-2" %>
+  </div>
+
+  <%= form.submit "Save",
+  class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
+
+  <%= link_to "Cancel", admin_users_path, class: "underline" %>
+<% end %>

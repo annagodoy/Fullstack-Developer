@@ -29,6 +29,11 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
         assert_select "td", text: user.full_name
         assert_select "td", text: user.email
         assert_select "td", text: user.role.humanize
+
+        assert_select "form[action=?]", admin_user_path(user) do
+          assert_select "input[name='_method'][value='delete']"
+          assert_select "button", text: "Delete"
+        end
       end
     end
   end
@@ -99,5 +104,158 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_entity
     assert_select "[role='alert']", /Email/
+  end
+
+  test "members cant edit another user" do
+    sign_in_as(users(:one))
+
+    get edit_admin_user_path(users(:two))
+
+    assert_response :forbidden
+  end
+
+  test "members cant update another user" do
+    sign_in_as(users(:one))
+    user = users(:two)
+
+    assert_no_changes -> { user.reload.attributes } do
+      patch admin_user_path(user), params: {
+        user: { full_name: "Changed", role: "admin" }
+      }
+    end
+
+    assert_response :forbidden
+  end
+
+  test "admins can edit users without changing passwords" do
+    admin = users(:one)
+    admin.update!(role: :admin)
+    sign_in_as(admin)
+
+    user = users(:two)
+
+    get edit_admin_user_path(user)
+
+    assert_response :success
+    assert_select "input[type='password']", count: 0
+
+    assert_no_changes -> { user.reload.password_digest } do
+      patch admin_user_path(user), params: {
+        user: {
+          full_name: "Updated Name",
+          email: "updated@example.com",
+          role: "admin",
+          password: "unwanted-password"
+        }
+      }
+    end
+
+    assert_redirected_to admin_users_path
+    assert_equal "Updated Name", user.reload.full_name
+    assert_equal "updated@example.com", user.email
+    assert user.admin?
+  end
+
+  test "invalid edits preserve saved values" do
+    admin = users(:one)
+    admin.update!(role: :admin)
+    sign_in_as(admin)
+
+    user = users(:two)
+
+    assert_no_changes -> { user.reload.attributes } do
+      patch admin_user_path(user), params: { user: { email: "invalid" } }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select "[role='alert']", /Email/
+  end
+
+  test "admins who lose admin access" do
+    admin = users(:one)
+    admin.update!(role: :admin)
+
+    sign_in_as(admin)
+
+    patch admin_user_path(admin), params: {
+      user: { role: "member" }
+    }
+
+    assert admin.reload.member?
+    assert_redirected_to profile_path
+
+    get admin_users_path
+    assert_response :forbidden
+  end
+
+  test "returns not found when editing a missing user" do
+    admin = users(:one)
+    admin.update!(role: :admin)
+
+    sign_in_as(admin)
+
+    get edit_admin_user_path(-1)
+
+    assert_response :not_found
+  end
+
+  test "allow admins to delete users" do
+    admin = users(:one)
+    admin.update!(role: :admin)
+
+    user = users(:two)
+
+    sign_in_as(admin)
+
+    assert_no_changes -> { admin.reload.attributes } do
+      assert_difference "User.count", -1 do
+        delete admin_user_path(user)
+      end
+    end
+
+    assert_redirected_to admin_users_path
+    assert_not User.exists?(user.id)
+
+    get admin_users_path
+    assert_response :success
+  end
+
+  test "visitors cant delete users" do
+    assert_no_difference "User.count" do
+      delete admin_user_path(users(:two))
+    end
+
+    assert_redirected_to new_session_path
+  end
+
+  test "members cant delete users" do
+    sign_in_as(users(:one))
+
+    assert_no_difference "User.count" do
+      delete admin_user_path(users(:two))
+    end
+
+    assert_response :forbidden
+  end
+
+  test "admins deleting their own account are signed out" do
+    admin = users(:one)
+    admin.update!(role: :admin)
+
+    sign_in_as(admin)
+
+    admin.sessions.create!
+
+    assert_difference "User.count", -1 do
+      delete admin_user_path(admin)
+    end
+
+    assert_redirected_to new_session_path
+    assert_not User.exists?(admin.id)
+    assert_not Session.exists?(user_id: admin.id)
+    assert_empty cookies[:session_id]
+
+    get admin_users_path
+    assert_redirected_to new_session_path
   end
 end

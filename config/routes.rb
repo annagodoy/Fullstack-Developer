@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#show"
 
-    resources :users, only: %i[index new create]
+    resources :users, except: :show
   end
 
   resource :profile, only: %i[show edit update destroy] do
