@@ -1,8 +1,12 @@
 class Admin::UsersController < Admin::BaseController
   before_action :set_user, only: %i[ edit update destroy]
+  before_action :set_page, only: :index
+
+  PAGE_SIZE = 25
 
   def index
-    @users = User.order(:full_name, :id)
+    @has_next_page = records.size > PAGE_SIZE
+    @users = records.first(PAGE_SIZE)
   end
 
   def new
@@ -50,6 +54,17 @@ class Admin::UsersController < Admin::BaseController
   end
 
   private
+
+  def records
+    User.order(:full_name, :id)
+      .offset((@page - 1) * PAGE_SIZE)
+      .limit(PAGE_SIZE + 1)
+      .to_a
+  end
+
+  def set_page
+    @page = [ Integer(params[:page].to_s, exception: false) || 1, 1 ].max
+  end
 
   def destination
     Current.user.reload.admin? ? admin_users_path : profile_path

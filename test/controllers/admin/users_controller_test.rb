@@ -258,4 +258,59 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     get admin_users_path
     assert_redirected_to new_session_path
   end
+
+  test "paginates users without repeating records" do
+    admin = users(:one)
+    admin.update!(role: :admin)
+    sign_in_as(admin)
+
+    26.times do |number|
+      User.create!(
+        full_name: "New User #{number}",
+        email: "new-user-#{number}@example.com",
+        password: "test-password"
+      )
+    end
+
+    get admin_users_path
+
+    assert_response :success
+
+    assert_equal users_ids.first(25).map { |id| "user_#{id}" }, page_ids
+    assert_select "a[rel='next'][href=?]", admin_users_path(page: 2)
+    assert_select "a[rel='prev']", count: 0
+
+    get admin_users_path, params: { page: 2 }
+
+    assert_response :success
+
+    assert_equal users_ids.drop(25).map { |id| "user_#{id}" }, page_ids
+    assert_select "a[rel='prev'][href=?]", admin_users_path(page: 1)
+    assert_select "a[rel='next']", count: 0
+  end
+
+  test "invalid page values fall back to the first page" do
+    admin = users(:one)
+    admin.update!(role: :admin)
+
+    sign_in_as(admin)
+
+    [ "invalid", "0", "-1" ].each do |page|
+      get admin_users_path, params: { page: page }
+
+      assert_response :success
+      assert_select "nav[aria-label='Users pagination'] span", text: "Page 1"
+      assert_select "#user_#{admin.id}"
+    end
+  end
+
+  private
+
+  def users_ids
+    User.order(:full_name, :id).pluck(:id)
+  end
+
+  def page_ids
+    css_select("tbody tr").map { |row| row["id"] }
+  end
 end
