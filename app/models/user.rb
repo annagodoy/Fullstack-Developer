@@ -18,6 +18,10 @@ class User < ApplicationRecord
 
   validates :full_name, presence: true
 
+  validates :password_confirmation,
+    presence: true,
+    on: :registration
+
   validate :acceptable_avatar
 
   enum :role, { member: 0, admin: 1 }, validate: true
