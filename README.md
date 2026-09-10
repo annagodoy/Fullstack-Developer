@@ -22,10 +22,10 @@ administrative access restrictions are implemented.
 Admins are redirected to a minimal dashboard after sign-in.
 
 Members are redirected to their own profile, where they can edit
-their full name and email, upload an avatar, and delete their account.
+their full name and email, upload an avatar and delete their account.
 
 Registration, admin users management,
-dashboard counters, and spreadsheet imports are not implemented yet.
+dashboard counters and spreadsheet imports are not implemented yet.
 
 ## Stack
 
@@ -35,8 +35,8 @@ dashboard counters, and spreadsheet imports are not implemented yet.
 - Hotwire: Turbo and Stimulus, with Importmap
 - Tailwind CSS and Propshaft
 - Solid Queue and Solid Cable
-- Minitest, Capybara, and Selenium
-- RuboCop, Brakeman, and Bundler Audit
+- Minitest, Capybara and Selenium
+- RuboCop, Brakeman and Bundler Audit
 
 Redis is not required in this project.
 
@@ -74,7 +74,7 @@ Tests use `umanni_test`.
 bin/dev
 ```
 
-This starts the Rails server, Tailwind watcher, and Solid Queue workers.
+This starts the Rails server, Tailwind watcher and Solid Queue workers.
 
 Open http://localhost:3000.
 The health endpoint is available at http://localhost:3000/up.
@@ -92,7 +92,7 @@ bin/importmap audit
 ```
 
 The test suite covers authentication, password reset, session
-revocation, and user validations. Code coverage is not measured yet.
+revocation and user validations. Code coverage is not measured yet.
 
 ## Authentication
 
@@ -104,8 +104,9 @@ least 12 characters.
 Successful password resets revoke all existing database sessions
 for the user.
 
-Registration is not implemented yet. Development users can be
-created through `bin/rails console`.
+Visitors can register at `/registration/new` with their full name,
+email, password and password confirmation. New accounts always
+receive the member role and are signed in automatically.
 
 Password reset emails are queued through Solid Queue. SMTP delivery
 has not been configured or validated yet.
@@ -120,11 +121,11 @@ docker build -t umanni .
 ```
 
 The GitHub Actions Docker job builds the image, starts it against
-a temporary PostgreSQL 17 service, and checks for HTTP 200 at `/up`.
+a temporary PostgreSQL 17 service and checks for HTTP 200 at `/up`.
 
 The container entrypoint prepares the production databases before
 starting the server. The CI check supplies separate connection URLs
-for the primary, queue, and cable databases.
+for the primary, queue and cable databases.
 
 The production Docker image was built and its `/up` endpoint
 returned HTTP 200 in GitHub Actions.
