@@ -145,4 +145,66 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     get profile_path
     assert_redirected_to new_session_path
   end
+
+  test "uploads an avatar to current user" do
+    user = users(:one)
+    sign_in_as(user)
+
+    patch profile_path, params: {
+      user: {
+        avatar_image: fixture_file_upload("avatar.png", "image/png")
+      }
+    }
+
+    assert_redirected_to profile_path
+    assert user.reload.avatar_image.attached?
+    assert_equal "image/png", user.avatar_image.content_type
+  end
+
+  test "visitor cant have avatars" do
+    get avatar_profile_path
+
+    assert_redirected_to new_session_path
+  end
+
+  test "returns not found when the current user has not an avatar " do
+    sign_in_as(users(:one))
+
+    get avatar_profile_path
+
+    assert_response :not_found
+  end
+
+  test "shows the current user avatar" do
+    user = users(:one)
+
+    user.avatar_image.attach(
+      fixture_file_upload("avatar.png", "image/png")
+    )
+
+    sign_in_as(user)
+
+    get avatar_profile_path
+
+    assert_response :success
+    assert_equal "image/png", response.media_type
+    assert_equal file_fixture("avatar.png").binread, response.body
+    assert_includes response.headers["Cache-Control"], "no-store"
+  end
+
+  test "cannot select another user avatar" do
+    user2 = users(:two)
+
+    user2.avatar_image.attach(
+      fixture_file_upload("avatar.png", "image/png")
+    )
+
+    sign_in_as(users(:one))
+
+    get avatar_profile_path, params: {
+      id: user2.id
+    }
+
+    assert_response :not_found
+  end
 end

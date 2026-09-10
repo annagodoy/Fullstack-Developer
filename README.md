@@ -7,6 +7,9 @@ and documentation drafting.
 Development follows an incremental workflow in which proposed changes
 are reviewed and discussed before proceeding.
 
+### Consulted Documentation
+[Active Storage Overview](https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers)
+
 # Umanni User Management
 
 The technical challenge is described in [CHALLENGE.md](CHALLENGE.md).
@@ -16,11 +19,12 @@ The technical challenge is described in [CHALLENGE.md](CHALLENGE.md).
 Initial setup, native Rails authentication, user roles and
 administrative access restrictions are implemented.
 
-Admins are redirected to a dashboard after sign-in.
-Members currently land on the protected home page and cannot access
-admin pages.
+Admins are redirected to a minimal dashboard after sign-in.
 
-Registration, profile management, admin users management,
+Members are redirected to their own profile, where they can edit
+their full name and email, upload an avatar, and delete their account.
+
+Registration, admin users management,
 dashboard counters, and spreadsheet imports are not implemented yet.
 
 ## Stack
@@ -131,3 +135,10 @@ returned HTTP 200 in GitHub Actions.
   passes positional options incompatible with JSON 3.
 - Credentials keys and local environment files are excluded from Git.
 - No seed data is defined yet.
+- Avatars accept JPEG and PNG files up to 5 MB.
+- Avatar downloads require authentication and serve only the current
+  user's file. Default Active Storage routes are disabled.
+- Files are stored locally. Production deployments must persist
+  `/rails/storage` or configure an external storage service.
+- Existing users must have their full names populated before applying
+  the migration that makes full names mandatory.

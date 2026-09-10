@@ -31,6 +31,18 @@
       %>
     </div>
 
+    <div>
+      <%= form.label :avatar_image, class: "block font-semibold" %>
+      <%= form.file_field :avatar_image,
+        accept: "image/jpeg,image/png",
+        aria: { describedby: "avatar-help" }
+      %>
+
+      <p id="avatar-help" class="text-sm text-gray-600">
+        JPEG or PNG only, up to 5MB.
+      </p>
+    </div>
+
     <%= form.submit "Save",
       class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
     <%= link_to "Cancel", profile_path, class: "underline" %>
