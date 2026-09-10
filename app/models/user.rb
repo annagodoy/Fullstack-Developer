@@ -26,6 +26,13 @@ class User < ApplicationRecord
 
   enum :role, { member: 0, admin: 1 }, validate: true
 
+  after_create_commit  { refresh_admin_dashboard }
+  after_destroy_commit { refresh_admin_dashboard }
+
+  after_update_commit do
+    refresh_admin_dashboard if saved_change_to_role?
+  end
+
   private
 
   def acceptable_avatar
@@ -38,5 +45,9 @@ class User < ApplicationRecord
     if avatar_image.byte_size > 5.megabytes
       errors.add(:avatar_image, "must be 5MB or smaller")
     end
+  end
+
+  def refresh_admin_dashboard
+    broadcast_refresh_later_to "admin_dashboard"
   end
 end

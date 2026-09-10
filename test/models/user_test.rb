@@ -1,6 +1,9 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+  include ActionCable::TestHelper
+
   test "downcases and strips email" do
     user = User.new(email: " DOWNCASED@EXAMPLE.COM ")
     assert_equal("downcased@example.com", user.email)
@@ -116,5 +119,56 @@ class UserTest < ActiveSupport::TestCase
 
     assert_not user.valid?
     assert_includes user.errors[:avatar_image], "must be 5MB or smaller"
+  end
+
+  test "create a user refresh the admin dashboard" do
+    assert_dashboard_refresh do
+      User.create!(
+        full_name: "New Member",
+        email: "new-member@example.com",
+        password: "test-password"
+      )
+    end
+  end
+
+  test "delete a user refresh the admin dashboard" do
+    assert_dashboard_refresh do
+      users(:two).destroy!
+    end
+  end
+
+  test "change a user role refresh the admin dashboard" do
+    assert_dashboard_refresh do
+      users(:two).update!(role: :admin)
+    end
+  end
+
+  test "change a user name dont refresh the admin dashboard" do
+    assert_no_enqueued_jobs(only: Turbo::Streams::BroadcastStreamJob) do
+      users(:two).update!(full_name: "Updated Name")
+    end
+  end
+
+  test "invalid user creation dont refresh the admin dashboard" do
+    assert_no_enqueued_jobs(only: Turbo::Streams::BroadcastStreamJob) do
+      user = User.new(email: "invalid")
+
+      assert_not user.save
+    end
+  end
+
+  private
+
+  def assert_dashboard_refresh
+    messages = capture_broadcasts("admin_dashboard") do
+      perform_enqueued_jobs(only: Turbo::Streams::BroadcastStreamJob) do
+        yield
+      end
+    end
+
+    assert_equal 1, messages.size
+
+    stream = Nokogiri::HTML.fragment(messages.first).at_css("turbo-stream")
+    assert_equal "refresh", stream&.[]("action")
   end
 end
