@@ -11,7 +11,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   test "create with valid credentials" do
     post session_path, params: { email: @user.email, password: "test-password" }
 
-    assert_redirected_to root_path
+    assert_redirected_to profile_path
   end
 
   test "create with invalid credentials" do
@@ -51,7 +51,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       password: "test-password"
     }
 
-    assert_redirected_to root_path
+    assert_redirected_to profile_path
 
     get admin_root_path
     assert_response :forbidden

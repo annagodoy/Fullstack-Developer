@@ -38,7 +38,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "accepts a valid password" do
-    user = User.new(email: "new@example.com", password: "test-password")
+    user = User.new(full_name: "New Member", email: "new@example.com", password: "test-password")
 
     assert user.valid?
   end
@@ -53,6 +53,7 @@ class UserTest < ActiveSupport::TestCase
 
   test "new users default to member" do
     user = User.create!(
+      full_name: "New Member",
       email: "member@example.com",
       password: "test-password"
     )
@@ -74,5 +75,46 @@ class UserTest < ActiveSupport::TestCase
 
     assert_not user.valid?
     assert user.errors.added?(:role, :inclusion, value: "invalid")
+  end
+
+  test "strips full name" do
+    user = User.new(full_name: "  John Doe  ")
+    assert_equal("John Doe", user.full_name)
+  end
+
+  test "requires a full name" do
+    user = User.new(
+      full_name: "",
+      email: "new@example.com",
+      password: "test-password"
+    )
+
+    assert_not user.valid?
+    assert user.errors.added?(:full_name, :blank)
+  end
+
+  test "rejects unsupported avatar formats" do
+    user = users(:one)
+    user.avatar_image = {
+      io: StringIO.new("plain text"),
+      filename: "avatar.txt",
+      content_type: "text/plain"
+    }
+
+    assert_not user.valid?
+    assert_includes user.errors[:avatar_image], "must be a JPEG or PNG"
+  end
+
+  test "rejects images larger than 5MB" do
+    user = users(:one)
+
+    user.avatar_image = {
+      io: StringIO.new("x" * (5.megabytes + 1)),
+      filename: "large.txt",
+      content_type: "text/plain"
+    }
+
+    assert_not user.valid?
+    assert_includes user.errors[:avatar_image], "must be 5MB or smaller"
   end
 end

@@ -81,7 +81,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
       password: "test-password"
     }
 
-    browser.assert_redirected_to root_path
+    browser.assert_redirected_to profile_path
 
     # second session
     @user.sessions.create!
