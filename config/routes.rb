@@ -4,6 +4,8 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root "dashboard#show"
+
+    resources :users, except: :show
   end
 
   resource :profile, only: %i[show edit update destroy] do
