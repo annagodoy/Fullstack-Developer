@@ -9,6 +9,7 @@ are reviewed and discussed before proceeding.
 
 ### Consulted Documentation
 [Active Storage Overview](https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers)
+[Active Record Callbacks](https://guides.rubyonrails.org/active_record_callbacks.html#aliases-for-after-commit)
 
 # Umanni User Management
 

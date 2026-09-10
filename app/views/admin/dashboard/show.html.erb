@@ -1,6 +1,28 @@
+<%= turbo_stream_from "admin_dashboard" %>
+
 <h1 class="text-2xl font-bold">Admin Dashboard</h1>
 
-<%= link_to "Manage users", 
-    admin_users_path, 
-    class: "underline" 
-%>
+<dl class="my-6 grid gap-4 sm:grid-cols-3">
+  <div class="rounded border p-4">
+    <dt>Total users</dt>
+    <dd id="total-users" class="text-3xl font-bold">
+      <%= @total_users %>
+    </dd>
+  </div>
+
+  <div class="rounded border p-4">
+    <dt>Admins</dt>
+    <dd id="admin-users" class="text-3xl font-bold">
+      <%= @users_by_role.fetch("admin", 0) %>
+    </dd>
+  </div>
+
+  <div class="rounded border p-4">
+    <dt>Members</dt>
+    <dd id="member-users" class="text-3xl font-bold">
+      <%= @users_by_role.fetch("member", 0) %>
+    </dd>
+  </div>
+</dl>
+
+<%= link_to "Manage users", admin_users_path, class: "underline" %>
