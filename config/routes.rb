@@ -6,6 +6,8 @@ Rails.application.routes.draw do
     root "dashboard#show"
 
     resources :users, except: :show
+
+    resources :user_imports, only: %i[new create show]
   end
 
   resource :profile, only: %i[show edit update destroy] do

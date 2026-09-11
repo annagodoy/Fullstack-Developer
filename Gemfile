@@ -66,3 +66,6 @@ gem "tailwindcss-rails", "~> 4.0"
 
 # Active Support 8.1.3.1 passes positional options to JSON.parse.
 gem "json", "~> 2.18"
+
+# Read CSV and XLSX spreadsheets for user imports.
+gem "roo", "~> 3.0"

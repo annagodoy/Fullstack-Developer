@@ -1,0 +1,4 @@
+invalid_email:
+  user_import: one
+  row_number: 2
+  message: Email is invalid

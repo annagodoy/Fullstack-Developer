@@ -1,0 +1,54 @@
+<div class="w-full max-w-xl">
+  <h1 class="text-2xl font-bold">Import users</h1>
+
+  <div class="my-4 space-y-3">
+    <p>
+      Upload a CSV or XLSX spreadsheet up to 5 MB and 5,000 data rows.
+      For XLSX files, only the first page is imported.
+    </p>
+
+    <p>
+      Required columns: <code>full_name</code> and <code>email</code>.
+      Optional column: <code>role</code>, with
+      <code>member</code> or <code>admin</code>.
+      Blank roles default to <code>member</code>.
+    </p>
+
+    <pre class="overflow-x-auto rounded bg-gray-100 p-3 text-sm text-gray-900">
+      full_name,email,role
+      Jane Doe,jane@example.com,admin
+      John Doe,john@example.com,member
+    </pre>
+
+    <p>
+      Existing emails are reported as row errors. Existing users are not updated.
+      Imported users can set a password using the password reset flow.
+    </p>
+  </div>
+
+  <% if @user_import.errors.any? %>
+    <div role="alert" class="mb-4 rounded border border-red-500 p-4">
+      <ul class="list-inside list-disc">
+        <% @user_import.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: [:admin, @user_import], class: "space-y-4" do |form| %>
+    <div>
+      <%= form.label :spreadsheet, class: "block font-medium" %>
+      <%= form.file_field :spreadsheet,
+        accept: ".csv,.xlsx",
+        required: true,
+        class: "mt-2 block w-full" %>
+    </div>
+
+    <%= form.submit "Upload spreadsheet",
+      class: "rounded bg-blue-700 px-4 py-2 text-white" %>
+  <% end %>
+
+  <%= link_to "Back to dashboard", admin_root_path,
+    class: "mt-6 inline-block underline" %>
+</div>

@@ -10,6 +10,8 @@ are reviewed and discussed before proceeding.
 ### Consulted Documentation
 [Active Storage Overview](https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers)
 [Active Record Callbacks](https://guides.rubyonrails.org/active_record_callbacks.html#aliases-for-after-commit)
+[Classic to Zeitwer](https://edgeguides.rubyonrails.org/classic_to_zeitwerk_howto.html)
+[Solid Queue](https://github.com/rails/solid_queue#concurrency-controls)
 
 # Umanni User Management
 
@@ -17,16 +19,20 @@ The technical challenge is described in [CHALLENGE.md](CHALLENGE.md).
 
 ## Current status
 
-Initial setup, native Rails authentication, user roles and
-administrative access restrictions are implemented.
+Implemented features include native Rails authentication, password
+reset, public registration and role based access control.
 
-Admins are redirected to a minimal dashboard after sign-in.
+Members can view and edit their own profile, upload an avatar and
+delete the account.
 
-Members are redirected to their own profile, where they can edit
-their full name and email, upload an avatar and delete their account.
+Administrators can manage users through a paginated interface and
+view live dashboard counters grouped by role.
 
-Registration, admin users management,
-dashboard counters and spreadsheet imports are not implemented yet.
+CSV and XLSX imports run asynchronously through Solid Queue, with
+live progress updates and row-level error reporting.
+
+Code coverage measurement, browser based system tests and final
+delivery documentation are still pending.
 
 ## Stack
 
@@ -111,6 +117,32 @@ receive the member role and are signed in automatically.
 
 Password reset emails are queued through Solid Queue. SMTP delivery
 has not been configured or validated yet.
+
+## Spreadsheet imports
+
+Admins can upload CSV or XLSX files from the dashboard.
+
+- Maximum file size: 5 MB.
+- Maximum data rows: 5,000.
+- XLSX imports use the first page.
+- Required headers: `full_name`, `email`.
+- Optional header: `role` (`member` or `admin`); defaults to `member`.
+- Empty rows are ignored.
+- Existing emails and invalid user data produce row errors.
+- Valid rows continue to be processed when another row fails.
+- Imported users recive random passwords and can use password reset
+  to create a new one. Email delivery must be configured for this flow.
+
+Solid Queue processes imports in the background. Keep the worker running
+with `bin/jobs`; `bin/dev` starts it in development.
+
+The import page updates through Solid Cable and displays progress and
+the first 100 row errors. All row errors remain stored in the database.
+A completed import may contain rejected rows.
+
+Committed rows are skipped when the same import job is running again.
+Unexpected failures are recorded in Solid Queue; automatic retries
+are not configured.
 
 ## Docker and CI
 
