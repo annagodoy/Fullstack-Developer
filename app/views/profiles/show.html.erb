@@ -1,47 +1,90 @@
-<div class="space-y-4">
+<div class="mx-auto max-w-3xl space-y-6">
   <% if notice = flash[:notice] %>
-    <p role="status"><%= notice %></p>
+    <div role="status" class="alert alert-success">
+      <span><%= notice %></span>
+    </div>
   <% end %>
 
-  <h1 class="text-2xl font-bold">My profile</h1>
+  <div>
+    <h1 class="text-2xl font-bold sm:text-3xl">My profile</h1>
+    <p class="mt-2 text-base-content/70">
+      Your account details.
+    </p>
+  </div>
 
-  <% if @current_user.avatar_image.attached? %>
-    <%= image_tag avatar_profile_path,
-      alt: "Avatar image",
-      class: "h-24 w-24 rounded-full object-cover",
-      width: 96,
-      height: 96
-    %>
-  <% end %>
+  <section aria-label="Profile information"
+    class="card border border-base-300 bg-base-100">
+    <div class="card-body gap-6 p-5 sm:p-8">
+      <div class="flex flex-wrap items-center gap-4">
+        <% if @current_user.avatar_image.attached? %>
+          <div class="avatar">
+            <div class="w-24 rounded-full">
+              <%= image_tag avatar_profile_path,
+                alt: "Avatar image",
+                width: 96,
+                height: 96 %>
+            </div>
+          </div>
+        <% else %>
+          <div aria-hidden="true"
+            class="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary">
+            <%= @current_user.full_name.to_s.first&.upcase %>
+          </div>
+        <% end %>
 
-  <dl class="space-y-2">
-    <div>
-      <dt class="font-semibold">Full name</dt>
-      <dd id="profile-full-name">
-        <%= @current_user.full_name.presence || "Not available" %>
-      </dd>
+        <div>
+          <p class="text-sm text-base-content/70">Account type</p>
+          <span class="badge badge-soft badge-primary mt-2">
+            <%= @current_user.role.humanize %>
+          </span>
+        </div>
+      </div>
+
+      <dl class="grid gap-5 sm:grid-cols-2">
+        <div class="min-w-0">
+          <dt class="text-sm text-base-content/70">Full name</dt>
+          <dd id="profile-full-name" class="mt-1 break-words font-medium">
+            <%= @current_user.full_name %>
+          </dd>
+        </div>
+
+        <div class="min-w-0">
+          <dt class="text-sm text-base-content/70">Email</dt>
+          <dd id="profile-email" class="mt-1 break-all font-medium">
+            <%= @current_user.email %>
+          </dd>
+        </div>
+      </dl>
+
+      <div class="card-actions border-t border-base-300 pt-5">
+        <%= link_to "Edit profile", edit_profile_path,
+          class: "btn btn-primary w-full sm:w-auto" %>
+      </div>
     </div>
-    <div>
-      <dt class="font-semibold">Email</dt>
-      <dd id="profile-email"><%= @current_user.email %></dd>
+  </section>
+
+  <section aria-labelledby="delete-profile-heading"
+    class="card border border-error/30 bg-base-100">
+    <div class="card-body p-5 sm:p-8">
+      <h2 id="delete-profile-heading" class="card-title text-error">
+        Delete account
+      </h2>
+
+      <p class="text-base-content/70">
+        Permanently delete your account and profile image.
+        This action cannot be undone.
+      </p>
+
+      <div class="card-actions mt-3">
+        <%= button_to "Delete profile", profile_path,
+          method: :delete,
+          form: {
+            data: {
+              turbo_confirm: "Delete your account? This cannot be undone."
+            }
+          },
+          class: "btn btn-outline btn-error" %>
+      </div>
     </div>
-    <div>
-      <dt class="font-semibold">Role</dt>
-      <dd><%= @current_user.role.humanize %></dd>
-    </div>
-  </dl>
-
-  <%= link_to "Edit profile", edit_profile_path, class: "underline" %>
-
-  <%= button_to "Delete profile", profile_path,
-    method: :delete, form: {
-      data: {
-        turbo_confirm: "Are you sure? This cant be undone."
-      }
-    },
-    class: "rounded bg-red-700 px-4 py-2 text-white"
-  %>
-
-  <%= button_to "Sign out", session_path, method: :delete,
-    class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
+  </section>
 </div>

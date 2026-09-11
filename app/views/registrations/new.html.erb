@@ -1,47 +1,74 @@
-<div class="w-full max-w-lg space-y-4">
-  <h1 class="text-2xl font-bold">Create profile</h1>
+<div class="mx-auto max-w-lg py-4 sm:py-10">
+  <div class="card border border-base-300 bg-base-100">
+    <div class="card-body gap-6 p-5 sm:p-8">
+      <div>
+        <h1 class="text-2xl font-bold">Create profile</h1>
+        <p class="mt-2 text-base-content/70">
+          Create your account.
+        </p>
+      </div>
 
-  <% if @user.errors.any? %>
-    <ul role="alert" class="rounded bg-red-50 p-4 text-red-700">
-      <% @user.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
+      <% if @user.errors.any? %>
+        <div role="alert" class="alert alert-error">
+          <ul class="list-inside list-disc">
+            <% @user.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
       <% end %>
-    </ul>
-  <% end %>
 
-  <%= form_with model: @user, url: registration_path,
-    class: "space-y-4" do |form| %>
-    <div>
-      <%= form.label :full_name, class: "block font-semibold" %>
-      <%= form.text_field :full_name, required: true, autocomplete: "name",
-        class: "w-full rounded border p-2" %>
-    </div>
+      <%= form_with model: @user, url: registration_path,
+        class: "space-y-5" do |form| %>
+        <div class="space-y-2">
+          <%= form.label :full_name, class: "block text-sm font-medium" %>
+          <%= form.text_field :full_name,
+            required: true,
+            autocomplete: "name",
+            class: "input w-full" %>
+        </div>
 
-    <div>
-      <%= form.label :email, class: "block font-semibold" %>
-      <%= form.email_field :email, required: true, autocomplete: "email",
-        class: "w-full rounded border p-2" %>
-    </div>
+        <div class="space-y-2">
+          <%= form.label :email, class: "block text-sm font-medium" %>
+          <%= form.email_field :email,
+            required: true,
+            autocomplete: "email",
+            class: "input w-full" %>
+        </div>
 
-    <div>
-      <%= form.label :password, class: "block font-semibold" %>
-      <%= form.password_field :password, required: true, minlength: 12,
-        autocomplete: "new-password", aria: { describedby: "password-help" },
-        class: "w-full rounded border p-2" %>
-      <p id="password-help" class="text-sm text-gray-600">
-        Use at least 12 characters.
+        <div class="space-y-2">
+          <%= form.label :password, class: "block text-sm font-medium" %>
+          <%= form.password_field :password,
+            required: true,
+            minlength: 12,
+            autocomplete: "new-password",
+            aria: { describedby: "password-help" },
+            class: "input w-full" %>
+
+          <p id="password-help" class="text-sm text-base-content/70">
+            Use at least 12 characters.
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <%= form.label :password_confirmation,
+            class: "block text-sm font-medium" %>
+          <%= form.password_field :password_confirmation,
+            required: true,
+            minlength: 12,
+            autocomplete: "new-password",
+            class: "input w-full" %>
+        </div>
+
+        <%= form.submit "Create account",
+          class: "btn btn-primary w-full" %>
+      <% end %>
+
+      <p class="text-center text-sm">
+        Already have an account?
+        <%= link_to "Sign in", new_session_path,
+          class: "link link-primary" %>
       </p>
     </div>
-
-    <div>
-      <%= form.label :password_confirmation, class: "block font-semibold" %>
-      <%= form.password_field :password_confirmation, required: true,
-        minlength: 12, autocomplete: "new-password",
-        class: "w-full rounded border p-2" %>
-    </div>
-
-    <%= form.submit "Create account",
-      class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
-    <%= link_to "Sign in", new_session_path, class: "underline" %>
-  <% end %>
+  </div>
 </div>

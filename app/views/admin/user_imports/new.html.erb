@@ -1,54 +1,72 @@
-<div class="w-full max-w-xl">
-  <h1 class="text-2xl font-bold">Import users</h1>
-
-  <div class="my-4 space-y-3">
-    <p>
-      Upload a CSV or XLSX spreadsheet up to 5 MB and 5,000 data rows.
-      For XLSX files, only the first page is imported.
-    </p>
-
-    <p>
-      Required columns: <code>full_name</code> and <code>email</code>.
-      Optional column: <code>role</code>, with
-      <code>member</code> or <code>admin</code>.
-      Blank roles default to <code>member</code>.
-    </p>
-
-    <pre class="overflow-x-auto rounded bg-gray-100 p-3 text-sm text-gray-900">
-      full_name,email,role
-      Jane Doe,jane@example.com,admin
-      John Doe,john@example.com,member
-    </pre>
-
-    <p>
-      Existing emails are reported as row errors. Existing users are not updated.
-      Imported users can set a password using the password reset flow.
+<div class="mx-auto max-w-3xl space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold sm:text-3xl">Import users</h1>
+    <p class="mt-2 text-base-content/70">
+      Create multiple accounts from a spreadsheet.
     </p>
   </div>
 
-  <% if @user_import.errors.any? %>
-    <div role="alert" class="mb-4 rounded border border-red-500 p-4">
-      <ul class="list-inside list-disc">
-        <% @user_import.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
+  <section aria-labelledby="spreadsheet-format-heading"
+    class="card border border-base-300 bg-base-100">
+    <div class="card-body gap-4 p-5 sm:p-8">
+      <h2 id="spreadsheet-format-heading" class="card-title">
+        Prepare your spreadsheet
+      </h2>
+
+      <ul class="list-inside list-disc space-y-2 text-base-content/80">
+        <li>CSV or XLSX, up to 5 MB and 5,000 data rows.</li>
+        <li>For XLSX files, only the first worksheet is imported.</li>
+        <li>Required columns: <code>full_name</code> and <code>email</code>.</li>
+        <li>
+          Optional <code>role</code>: <code>member</code> or
+          <code>admin</code>. Blank roles default to <code>member</code>.
+        </li>
       </ul>
+
+      <pre tabindex="0" aria-label="Example CSV" class="overflow-x-auto rounded-box bg-base-200 p-4 text-sm">
+        full_name,email,role
+        Jane Doe,jane@example.com,admin
+        John Doe,john@example.com,member
+      </pre>
+
+      <p class="text-sm text-base-content/70">
+        Existing emails are reported as row errors. Existing accounts
+        are not updated. Imported users can choose a password on
+        password reset flow.
+      </p>
     </div>
-  <% end %>
+  </section>
 
-  <%= form_with model: [:admin, @user_import], class: "space-y-4" do |form| %>
-    <div>
-      <%= form.label :spreadsheet, class: "block font-medium" %>
-      <%= form.file_field :spreadsheet,
-        accept: ".csv,.xlsx",
-        required: true,
-        class: "mt-2 block w-full" %>
+  <div class="card border border-base-300 bg-base-100">
+    <div class="card-body p-5 sm:p-8">
+      <% if @user_import.errors.any? %>
+        <div role="alert" class="alert alert-error mb-4">
+          <ul class="list-inside list-disc">
+            <% @user_import.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_with model: [:admin, @user_import],
+        class: "space-y-5" do |form| %>
+        <div class="space-y-2">
+          <%= form.label :spreadsheet,
+            class: "block text-sm font-medium" %>
+
+          <%= form.file_field :spreadsheet,
+            accept: ".csv,.xlsx",
+            required: true,
+            class: "file-input w-full" %>
+        </div>
+
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <%= form.submit "Upload spreadsheet", class: "btn btn-primary" %>
+          <%= link_to "Back to dashboard", admin_root_path,
+            class: "btn btn-ghost" %>
+        </div>
+      <% end %>
     </div>
-
-    <%= form.submit "Upload spreadsheet",
-      class: "rounded bg-blue-700 px-4 py-2 text-white" %>
-  <% end %>
-
-  <%= link_to "Back to dashboard", admin_root_path,
-    class: "mt-6 inline-block underline" %>
+  </div>
 </div>

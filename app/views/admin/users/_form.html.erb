@@ -1,85 +1,105 @@
 <% if @user.errors.any? %>
-  <ul role="alert" class="rounded bg-red-50 p-4 text-red-700">
-    <% @user.errors.full_messages.each do |message| %>
+  <div role="alert" class="alert alert-error mb-4">
+    <ul class="list-inside list-disc">
+      <% @user.errors.full_messages.each do |message| %>
         <li><%= message %></li>
-    <% end %>
-  </ul>
+      <% end %>
+    </ul>
+  </div>
 <% end %>
 
-<%= form_with model: [:admin, @user], class: "space-y-4" do |form| %>
-
-  <div>
-    <%= form.label :full_name %>
-    <%= form.text_field :full_name, 
-      required: true,
-      class: "block w-full rounded border p-2" 
-    %>
-  </div>
-
-  <div>
-    <%= form.label :email %>
-    <%= form.email_field :email, required: true,
-      class: "block w-full rounded border p-2" 
-    %>
-  </div>
-
-  <% if @user.new_record? %>
-    <div>
-      <%= form.label :password, "Initial password" %>
-      <%= form.password_field :password, 
-        required: true, minlength: 12,
-        autocomplete: "new-password",
-        class: "block w-full rounded border p-2" 
-      %>
-
-      <p class="text-sm text-gray-600">Use at least 12 characters.</p>
+<%= form_with model: [:admin, @user], class: "space-y-6" do |form| %>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div class="min-w-0 space-y-2">
+      <%= form.label :full_name, class: "block text-sm font-medium" %>
+      <%= form.text_field :full_name,
+        required: true,
+        autocomplete: "name",
+        class: "input w-full" %>
     </div>
-  <% end %>
 
-  <div>
-    <%= form.label :role %>
-    <%= form.select :role,
-      User.roles.keys.map { |role| [role.humanize, role] }, 
-      {},
-      class: "block w-full rounded border p-2" %>
+    <div class="min-w-0 space-y-2">
+      <%= form.label :email, class: "block text-sm font-medium" %>
+      <%= form.email_field :email,
+        required: true,
+        autocomplete: "email",
+        class: "input w-full" %>
+    </div>
+
+    <div class="min-w-0 space-y-2">
+      <%= form.label :role, class: "block text-sm font-medium" %>
+      <%= form.select :role,
+        User.roles.keys.map { |role| [role.humanize, role] },
+        {},
+        class: "select w-full",
+        aria: { describedby: "role-help" } %>
+
+      <p id="role-help" class="text-sm text-base-content/70">
+        Admins can manage all users and import spreadsheets.
+      </p>
+    </div>
+
+    <% if @user.new_record? %>
+      <div class="min-w-0 space-y-2">
+        <%= form.label :password, "Initial password",
+          class: "block text-sm font-medium" %>
+
+        <%= form.password_field :password,
+          required: true,
+          minlength: 12,
+          autocomplete: "new-password",
+          aria: { describedby: "password-help" },
+          class: "input w-full" %>
+
+        <p id="password-help" class="text-sm text-base-content/70">
+          Use at least 12 characters.
+        </p>
+      </div>
+    <% end %>
   </div>
 
-  <div>
-    <%= form.label :avatar_image, "Avatar" %>
+  <div class="space-y-2">
+    <%= form.label :avatar_image, "Avatar",
+      class: "block text-sm font-medium" %>
 
     <%= form.file_field :avatar_image,
       accept: "image/jpeg,image/png",
       aria: { describedby: "avatar-help" },
-      class: "mt-2 block w-full" %>
+      class: "file-input w-full" %>
 
-    <p id="avatar-help" class="mt-1 text-sm text-gray-600">
-      Upload a new avatar.
-      JPEG or PNG, up to 5 MB.
+    <p id="avatar-help" class="text-sm text-base-content/70">
+      JPEG or PNG, up to 5 MB. Upload a new image to replace the current avatar.
     </p>
   </div>
 
-  <%= form.submit "Save",
-  class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
-
-  <%= link_to "Cancel", admin_users_path, class: "underline" %>
+  <div class="flex flex-col gap-2 border-t border-base-300 pt-5 sm:flex-row">
+    <%= form.submit "Save", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_users_path, class: "btn btn-ghost" %>
+  </div>
 <% end %>
 
 <% if @user.persisted? && @user.avatar_image.attachment&.persisted? %>
-  <div class="mt-6 space-y-3">
-    <p class="font-medium">Current avatar</p>
+  <section aria-labelledby="current-avatar-heading"
+    class="mt-6 border-t border-base-300 pt-6">
+    <h2 id="current-avatar-heading" class="font-semibold">Current avatar</h2>
 
-    <%= image_tag avatar_admin_user_path(@user),
-      alt: "Current avatar",
-      width: 96,
-      height: 96,
-      class: "h-24 w-24 rounded-full object-cover" %>
+    <div class="mt-4 flex flex-wrap items-center gap-4">
+      <div class="avatar">
+        <div class="w-24 rounded-full">
+          <%= image_tag avatar_admin_user_path(@user),
+            alt: "Current avatar",
+            width: 96,
+            height: 96 %>
+        </div>
+      </div>
 
-    <%= button_to "Remove avatar",
-      avatar_admin_user_path(@user),
-      method: :delete,
-      form: {
-        data: { turbo_confirm: "Are you sure? This cant be undone." }
-      },
-      class: "rounded bg-red-700 px-4 py-2 text-white" %>
-  </div>
+      <%= button_to "Remove avatar",
+        avatar_admin_user_path(@user),
+        method: :delete,
+        form: {
+          data: { turbo_confirm: "Remove this user's avatar?" }
+        },
+        class: "btn btn-outline btn-error btn-sm" %>
+    </div>
+  </section>
 <% end %>
