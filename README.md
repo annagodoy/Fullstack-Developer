@@ -17,6 +17,7 @@ are reviewed and discussed before proceeding.
 [Daisy UI](https://daisyui.com/docs/use/)
 [Turbo](https://turbo.hotwired.dev/reference/drive)
 [CodeQl](https://codeql.github.com/codeql-query-help/ruby/rb-clear-text-storage-sensitive-data/)
+[Mailcatcher](https://mailcatcher.me/)
 
 # Umanni User Management
 
@@ -164,8 +165,48 @@ Visitors can register at `/registration/new` with their full name,
 email, password and password confirmation. New accounts always
 receive the member role and are signed in automatically.
 
-Password reset emails are queued through Solid Queue. SMTP delivery
-has not been configured or validated yet.
+Password reset emails are queued through Solid Queue.
+
+## Email delivery
+
+Development emails are captured locally with MailCatcher and are
+not delivered to real inboxes.
+
+Install and start MailCatcher separately from the application bundle:
+```sh
+  gem install mailcatcher
+  mailcatcher
+```
+
+Start the application and background workers:
+```sh
+  bin/dev
+```
+
+Open http://127.0.0.1:1080 to view captured messages.
+Request a password reset for an existing account and follow the link
+in the captured email.
+
+Development SMTP uses 127.0.0.1:1025 without authentication or TLS.
+The test environment uses the test delivery adapter and does not
+require MailCatcher.
+
+Production SMTP is configured through these environment variables:
+
+- SMTP_ADDRESS
+- SMTP_PORT (defaults to 587)
+- SMTP_USERNAME
+- SMTP_PASSWORD
+- MAIL_FROM
+- APP_HOST — public application hostname, without a protocol
+  (for example, app.example.com).
+- APP_PROTOCOL — defaults to https.
+
+Production SMTP requires STARTTLS. Credentials must be supplied
+through the deployment environment and must not be committed.
+
+The password reset flow was validated locally through MailCatcher.
+Delivery through an external production provider has not been verified.
 
 ## Spreadsheet imports
 
