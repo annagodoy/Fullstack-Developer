@@ -12,6 +12,8 @@ are reviewed and discussed before proceeding.
 [Active Record Callbacks](https://guides.rubyonrails.org/active_record_callbacks.html#aliases-for-after-commit)
 [Classic to Zeitwer](https://edgeguides.rubyonrails.org/classic_to_zeitwerk_howto.html)
 [Solid Queue](https://github.com/rails/solid_queue#concurrency-controls)
+[SimpleCov](https://github.com/simplecov-ruby/simplecov?tab=readme-ov-file)
+[GitHub Artifacts](https://docs.github.com/en/actions/tutorials/store-and-share-data)
 
 # Umanni User Management
 
@@ -31,8 +33,8 @@ view live dashboard counters grouped by role.
 CSV and XLSX imports run asynchronously through Solid Queue, with
 live progress updates and row-level error reporting.
 
-Code coverage measurement, browser based system tests and final
-delivery documentation are still pending.
+Browser based system tests and final delivery documentation are
+still pending.
 
 ## Stack
 
@@ -99,7 +101,17 @@ bin/importmap audit
 ```
 
 The test suite covers authentication, password reset, session
-revocation and user validations. Code coverage is not measured yet.
+revocation and user validations.
+
+Line coverage is measured with SimpleCov, including merged results
+from parallel test workers. The CI test job requires at least 90%
+line coverage and uploads the HTML report as `coverage-report`.
+
+To generate the report locally:
+```sh
+  RAILS_ENV=test COVERAGE=1 bin/rails test
+  bundle exec simplecov open
+```
 
 ## Authentication
 
