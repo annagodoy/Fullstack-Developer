@@ -35,8 +35,14 @@ view live dashboard counters grouped by role.
 CSV and XLSX imports run asynchronously through Solid Queue, with
 live progress updates and row-level error reporting.
 
-Browser based system tests and final delivery documentation are
-still pending.
+Browser tests cover registration, authentication, profile management,
+administrative user management and automatic import progress updates.
+
+A narrow-screen test checks administrative navigation and horizontal
+page overflow. Tests run with Selenium and headless Chrome.
+
+Final delivery documentation and production setup verification
+are still pending.
 
 ## Stack
 
