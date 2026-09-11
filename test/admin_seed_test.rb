@@ -24,6 +24,11 @@ class AdminSeedTest < ActiveSupport::TestCase
 
     admin = User.find_by!(email: "seed-admin@example.com")
 
+    assert_not_equal "seed-test-password", admin.reload.password_digest
+    assert BCrypt::Password.new(admin.password_digest).is_password?(
+      "seed-test-password"
+    )
+
     assert admin.admin?
     assert_equal "Seed Admin", admin.full_name
     assert admin.authenticate("seed-test-password")

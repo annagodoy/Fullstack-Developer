@@ -25,7 +25,15 @@ else
 
     puts "Admin account already exists. No changes were made."
   else
-    User.create!(admin_attributes.merge(email: email, role: :admin))
+    admin = User.new(
+      full_name: admin_attributes.fetch(:full_name),
+      email: email,
+      role: :admin
+    )
+
+    admin.password = admin_attributes.fetch(:password)
+    admin.save!
+
     puts "Admin account created."
   end
 end
