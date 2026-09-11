@@ -1,13 +1,16 @@
 admin_attributes = {
   full_name: ENV["ADMIN_FULL_NAME"],
-  email: ENV["ADMIN_EMAIL"],
-  password: ENV["ADMIN_PASSWORD"]
+  email: ENV["ADMIN_EMAIL"]
 }
 
-if admin_attributes.values.all?(&:blank?)
+admin_password = ENV["ADMIN_PASSWORD"]
+
+if admin_attributes.values.all?(&:blank?) && admin_password.blank?
   puts "Admin seed skipped. Set ADMIN_FULL_NAME, ADMIN_EMAIL and ADMIN_PASSWORD."
 else
   missing = admin_attributes.select { |_key, value| value.blank? }.keys
+
+  missing << :password if admin_password.blank?
 
   if missing.any?
     raise ArgumentError,
@@ -31,7 +34,7 @@ else
       role: :admin
     )
 
-    admin.password = admin_attributes.fetch(:password)
+    admin.password = admin_password
     admin.save!
 
     puts "Admin account created."

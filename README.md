@@ -16,6 +16,7 @@ are reviewed and discussed before proceeding.
 [GitHub Artifacts](https://docs.github.com/en/actions/tutorials/store-and-share-data)
 [Daisy UI](https://daisyui.com/docs/use/)
 [Turbo](https://turbo.hotwired.dev/reference/drive)
+[CodeQl](https://codeql.github.com/codeql-query-help/ruby/rb-clear-text-storage-sensitive-data/)
 
 # Umanni User Management
 
