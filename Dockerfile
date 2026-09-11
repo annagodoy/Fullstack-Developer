@@ -1,9 +1,6 @@
-# syntax=docker/dockerfile:1
-# check=error=true
-
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t umanni .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name umanni umanni
+# Build and run the local production stack with Docker Compose.
+# See README.md for environment configuration.
+# docker compose up --build -d
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
