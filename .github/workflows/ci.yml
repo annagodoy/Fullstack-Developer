@@ -158,11 +158,27 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Run tests
+      - name: Prepare test database
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/umanni_test
-        run: bin/rails db:test:prepare test
+        run: bin/rails db:test:prepare
+
+      - name: Run tests with coverage
+        env:
+          RAILS_ENV: test
+          COVERAGE: "1"
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/umanni_test
+        run: bin/rails test
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+          if-no-files-found: warn
 
   system-test:
     runs-on: ubuntu-latest
