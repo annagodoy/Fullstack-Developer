@@ -1,88 +1,128 @@
 <%= turbo_stream_from @user_import %>
 
-<div class="w-full max-w-xl">
-  <h1 class="text-2xl font-bold">User import</h1>
-
-  <div class="mt-6">
-    <label for="import-progress" class="block font-medium">
-      Progress: <%= @user_import.progress_porcentage %>%
-    </label>
-
-    <progress
-      id="import-progress"
-      max="100"
-      value="<%= @user_import.progress_porcentage %>"
-      class="mt-2 h-4 w-full"
-    >
-      <%= @user_import.progress_porcentage %>%
-    </progress>
-  </div>
-
-  <dl class="my-6 space-y-4">
-    <div>
-      <dt class="font-medium">File</dt>
-      <dd><%= @user_import.spreadsheet.filename %></dd>
-    </div>
+<%= turbo_frame_tag dom_id(@user_import), target: "_top" do %>
+  <div class="mx-auto max-w-3xl space-y-6"
+    data-controller="<%= 'import-progress' if @user_import.pending? || @user_import.processing? %>"
+    data-import-progress-url-value="<%= admin_user_import_path(@user_import) %>">
 
     <div>
-      <dt class="font-medium">Status</dt>
-      <dd id="import-status"><%= @user_import.status.humanize %></dd>
+      <h1 class="text-2xl font-bold sm:text-3xl">User import</h1>
+      <p class="mt-2 text-base-content/70">
+        Follow processing progresss.
+      </p>
     </div>
 
-    <div>
-      <dt class="font-medium">Processed rows</dt>
-      <dd>
-        <%= @user_import.processed_rows %> / <%= @user_import.total_rows %>
-      </dd>
-    </div>
+    <div class="card border border-base-300 bg-base-100">
+      <div class="card-body gap-6 p-5 sm:p-8">
+        <dl class="grid gap-5 sm:grid-cols-2">
+          <div class="min-w-0">
+            <dt class="text-sm text-base-content/70">File</dt>
+            <dd class="mt-1 break-all font-medium">
+              <%= @user_import.spreadsheet.filename %>
+            </dd>
+          </div>
 
-    <div>
-      <dt class="font-medium">Failed rows</dt>
-      <dd><%= @user_import.failed_rows %></dd>
-    </div>
-  </dl>
+          <div>
+            <dt class="text-sm text-base-content/70">Status</dt>
+            <dd id="import-status" class="mt-1 font-medium">
+              <%= @user_import.status.humanize %>
+            </dd>
+          </div>
 
-  <% if @user_import.error_message.present? %>
-    <p role="alert" class="mb-4 text-red-700">
-      <%= @user_import.error_message %>
-    </p>
-  <% end %>
+          <div>
+            <dt class="text-sm text-base-content/70">Processed rows</dt>
+            <dd class="mt-1 text-2xl font-semibold">
+              <%= @user_import.processed_rows %> / <%= @user_import.total_rows %>
+            </dd>
+          </div>
 
-  <% if @rows_errors.any? %>
-    <section aria-labelledby="import-errors-heading" class="my-6">
-      <h2 id="import-errors-heading" class="text-xl font-bold">
-        Row errors
-      </h2>
+          <div>
+            <dt class="text-sm text-base-content/70">Failed rows</dt>
+            <dd class="mt-1 text-2xl font-semibold">
+              <%= @user_import.failed_rows %>
+            </dd>
+          </div>
+        </dl>
 
-      <% if @user_import.failed_rows > 100 %>
-        <p class="mt-2">Showing the first 100 errors.</p>
-      <% end %>
+        <div>
+          <label for="import-progress" class="block text-sm font-medium">
+            Progress: <%= @user_import.progress_porcentage %>%
+          </label>
 
-      <div class="mt-4 overflow-x-auto">
-        <table class="w-full text-left">
-          <thead>
-            <tr>
-              <th scope="col" class="border-b p-2">Row</th>
-              <th scope="col" class="border-b p-2">Error</th>
-            </tr>
-          </thead>
+          <progress id="import-progress"
+            max="100"
+            value="<%= @user_import.progress_porcentage %>"
+            class="progress progress-primary mt-3 w-full">
+            <%= @user_import.progress_porcentage %>%
+          </progress>
+        </div>
 
-          <tbody>
-            <% @rows_errors.each do |error| %>
-              <tr>
-                <td class="border-b p-2"><%= error.row_number %></td>
-                <td class="border-b p-2"><%= error.message %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+        <% if @user_import.completed? %>
+          <div role="status"
+            class="alert <%= @user_import.failed_rows.positive? ? 'alert-warning' : 'alert-success' %>">
+            <span>
+              <% if @user_import.failed_rows.positive? %>
+                Processing finished. Review the rejected rows below.
+              <% else %>
+                All rows were imported successfully.
+              <% end %>
+            </span>
+          </div>
+        <% end %>
+
+        <% if @user_import.error_message.present? %>
+          <div role="alert" class="alert alert-error">
+            <span class="break-words"><%= @user_import.error_message %></span>
+          </div>
+        <% end %>
       </div>
-    </section>
-  <% end %>
+    </div>
 
-  <%= link_to "Import another spreadsheet", new_admin_user_import_path,
-    class: "block underline" %>
+    <% if @rows_errors.any? %>
+      <section aria-labelledby="import-errors-heading"
+        class="overflow-hidden rounded-box border border-base-300 bg-base-100">
+        <div class="p-5">
+          <h2 id="import-errors-heading" class="text-xl font-semibold">
+            Row errors
+          </h2>
 
-  <%= link_to "Back to dashboard", admin_root_path,
-    class: "mt-4 inline-block underline" %>
-</div>
+          <% if @user_import.failed_rows > 100 %>
+            <p class="mt-2 text-sm text-base-content/70">
+              Showing the first 100 errors.
+            </p>
+          <% end %>
+        </div>
+
+        <div class="overflow-x-auto" tabindex="0"
+          role="region" aria-label="Import row errors">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th scope="col">Row</th>
+                <th scope="col">Error</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @rows_errors.each do |error| %>
+                <tr>
+                  <td><%= error.row_number %></td>
+                  <td class="min-w-48 break-words whitespace-normal">
+                    <%= error.message %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+
+    <div class="flex flex-col gap-2 sm:flex-row">
+      <%= link_to "Import another spreadsheet", new_admin_user_import_path,
+        class: "btn btn-primary" %>
+
+      <%= link_to "Back to dashboard", admin_root_path,
+        class: "btn btn-ghost" %>
+    </div>
+  </div>
+<% end %>

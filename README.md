@@ -14,6 +14,8 @@ are reviewed and discussed before proceeding.
 [Solid Queue](https://github.com/rails/solid_queue#concurrency-controls)
 [SimpleCov](https://github.com/simplecov-ruby/simplecov?tab=readme-ov-file)
 [GitHub Artifacts](https://docs.github.com/en/actions/tutorials/store-and-share-data)
+[Daisy UI](https://daisyui.com/docs/use/)
+[Turbo](https://turbo.hotwired.dev/reference/drive)
 
 # Umanni User Management
 
@@ -42,7 +44,7 @@ still pending.
 - Rails 8.1.3.1
 - PostgreSQL 17
 - Hotwire: Turbo and Stimulus, with Importmap
-- Tailwind CSS and Propshaft
+- Tailwind CSS, daisyUI and Propshaft
 - Solid Queue and Solid Cable
 - Minitest, Capybara and Selenium
 - RuboCop, Brakeman and Bundler Audit
@@ -155,6 +157,10 @@ A completed import may contain rejected rows.
 Committed rows are skipped when the same import job is running again.
 Unexpected failures are recorded in Solid Queue; automatic retries
 are not configured.
+
+While an import is pending or processing, the page also checks the
+status every three seconds to recover updates missed before the
+live connection was established. Checks stop after completion or failure.
 
 ## Docker and CI
 

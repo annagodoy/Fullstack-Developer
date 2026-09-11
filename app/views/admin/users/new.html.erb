@@ -1,5 +1,14 @@
-<div class="w-full max-w-lg space-y-4">
-  <h1 class="text-2xl font-bold">New user</h1>
+<div class="mx-auto max-w-3xl space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold sm:text-3xl">New user</h1>
+    <p class="mt-2 text-base-content/70">
+      Create an account.
+    </p>
+  </div>
 
-  <%= render "form" %>
+  <div class="card border border-base-300 bg-base-100">
+    <div class="card-body p-5 sm:p-8">
+      <%= render "form" %>
+    </div>
+  </div>
 </div>

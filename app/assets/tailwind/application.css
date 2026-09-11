@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@source not "./daisyui{,*}.mjs";
+
+@plugin "./daisyui.mjs" {
+  themes: light --default;
+}
+
+@layer components {
+  nav[aria-label="Main navigation"] a[aria-current="page"] {
+    @apply bg-primary text-primary-content;
+  }
+}

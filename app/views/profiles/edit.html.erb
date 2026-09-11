@@ -1,50 +1,63 @@
-<div class="w-full max-w-lg space-y-4">
-  <h1 class="text-2xl font-bold">Edit profile</h1>
+<div class="mx-auto max-w-3xl space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold sm:text-3xl">Edit profile</h1>
+  </div>
 
-  <% if @current_user.errors.any? %>
-    <div role="alert" class="rounded bg-red-50 p-4 text-red-700">
-      <ul>
-        <% @current_user.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
+  <div class="card border border-base-300 bg-base-100">
+    <div class="card-body p-5 sm:p-8">
+      <% if @current_user.errors.any? %>
+        <div role="alert" class="alert alert-error mb-4">
+          <ul class="list-inside list-disc">
+            <% @current_user.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_with model: @current_user, url: profile_path,
+        method: :patch, class: "space-y-6" do |form| %>
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div class="min-w-0 space-y-2">
+            <%= form.label :full_name,
+              class: "block text-sm font-medium" %>
+
+            <%= form.text_field :full_name,
+              autocomplete: "name",
+              required: true,
+              class: "input w-full" %>
+          </div>
+
+          <div class="min-w-0 space-y-2">
+            <%= form.label :email,
+              class: "block text-sm font-medium" %>
+
+            <%= form.email_field :email,
+              autocomplete: "email",
+              required: true,
+              class: "input w-full" %>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <%= form.label :avatar_image, "Avatar",
+            class: "block text-sm font-medium" %>
+
+          <%= form.file_field :avatar_image,
+            accept: "image/jpeg,image/png",
+            aria: { describedby: "avatar-help" },
+            class: "file-input w-full" %>
+
+          <p id="avatar-help" class="text-sm text-base-content/70">
+            JPEG or PNG, up to 5 MB. Leave empty to keep your current avatar.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-2 border-t border-base-300 pt-5 sm:flex-row">
+          <%= form.submit "Save", class: "btn btn-primary" %>
+          <%= link_to "Cancel", profile_path, class: "btn btn-ghost" %>
+        </div>
+      <% end %>
     </div>
-  <% end %>
-
-  <%= form_with model: @current_user, url: profile_path,
-    method: :patch, class: "space-y-4" do |form| %>
-    <div>
-      <%= form.label :full_name, class: "block font-semibold" %>
-      <%= form.text_field :full_name,
-        autocomplete: "name",
-        class: "w-full rounded border p-2",
-        required: true
-      %>
-    </div>
-
-    <div>
-      <%= form.label :email, class: "block font-semibold" %>
-      <%= form.email_field :email,
-        autocomplete: "email",
-        class: "w-full rounded border p-2",
-        required: true
-      %>
-    </div>
-
-    <div>
-      <%= form.label :avatar_image, class: "block font-semibold" %>
-      <%= form.file_field :avatar_image,
-        accept: "image/jpeg,image/png",
-        aria: { describedby: "avatar-help" }
-      %>
-
-      <p id="avatar-help" class="text-sm text-gray-600">
-        JPEG or PNG only, up to 5MB.
-      </p>
-    </div>
-
-    <%= form.submit "Save",
-      class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
-    <%= link_to "Cancel", profile_path, class: "underline" %>
-  <% end %>
+  </div>
 </div>
