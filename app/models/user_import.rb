@@ -1,6 +1,10 @@
 class UserImport < ApplicationRecord
   has_one_attached :spreadsheet
 
+  has_many :row_errors,
+    class_name: "UserImportError",
+    dependent: :destroy
+
   enum :status, {
     pending: 0,
     processing: 1,
@@ -15,6 +19,14 @@ class UserImport < ApplicationRecord
     }
 
   validate :acceptable_spreadsheet
+
+  after_update_commit :refresh_import_page
+
+  def progress_porcentage
+    return 0 if total_rows.zero?
+
+    (processed_rows * 100 / total_rows)
+  end
 
   private
 
@@ -31,5 +43,9 @@ class UserImport < ApplicationRecord
     if spreadsheet.byte_size > 5.megabytes
       errors.add(:spreadsheet, "must be 5MB or smaller")
     end
+  end
+
+  def refresh_import_page
+    broadcast_refresh_to self
   end
 end

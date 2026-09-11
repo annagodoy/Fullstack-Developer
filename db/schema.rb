@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_10_163325) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_10_231405) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -51,6 +51,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_163325) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "user_import_errors", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "message", null: false
+    t.integer "row_number", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_import_id", null: false
+    t.index ["user_import_id", "row_number"], name: "index_user_import_errors_on_user_import_id_and_row_number", unique: true
+    t.index ["user_import_id"], name: "index_user_import_errors_on_user_import_id"
+    t.check_constraint "row_number >= 2", name: "user_import_errors_valid_row_number"
+  end
+
   create_table "user_imports", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "error_message"
@@ -78,4 +89,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_163325) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "sessions", "users"
+  add_foreign_key "user_import_errors", "user_imports"
 end

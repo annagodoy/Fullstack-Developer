@@ -1,5 +1,22 @@
+<%= turbo_stream_from @user_import %>
+
 <div class="w-full max-w-xl">
   <h1 class="text-2xl font-bold">User import</h1>
+
+  <div class="mt-6">
+    <label for="import-progress" class="block font-medium">
+      Progress: <%= @user_import.progress_porcentage %>%
+    </label>
+
+    <progress
+      id="import-progress"
+      max="100"
+      value="<%= @user_import.progress_porcentage %>"
+      class="mt-2 h-4 w-full"
+    >
+      <%= @user_import.progress_porcentage %>%
+    </progress>
+  </div>
 
   <dl class="my-6 space-y-4">
     <div>
@@ -29,6 +46,38 @@
     <p role="alert" class="mb-4 text-red-700">
       <%= @user_import.error_message %>
     </p>
+  <% end %>
+
+  <% if @rows_errors.any? %>
+    <section aria-labelledby="import-errors-heading" class="my-6">
+      <h2 id="import-errors-heading" class="text-xl font-bold">
+        Row errors
+      </h2>
+
+      <% if @user_import.failed_rows > 100 %>
+        <p class="mt-2">Showing the first 100 errors.</p>
+      <% end %>
+
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr>
+              <th scope="col" class="border-b p-2">Row</th>
+              <th scope="col" class="border-b p-2">Error</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% @rows_errors.each do |error| %>
+              <tr>
+                <td class="border-b p-2"><%= error.row_number %></td>
+                <td class="border-b p-2"><%= error.message %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
   <% end %>
 
   <%= link_to "Import another spreadsheet", new_admin_user_import_path,

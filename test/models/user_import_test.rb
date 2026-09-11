@@ -1,6 +1,8 @@
 require "test_helper"
 
 class UserImportTest < ActiveSupport::TestCase
+  include ActionCable::TestHelper
+
   test "starts pending with zero counters" do
     user_import = UserImport.new
 
@@ -72,5 +74,45 @@ class UserImportTest < ActiveSupport::TestCase
     assert_not user_import.valid?
     assert_includes user_import.errors[:spreadsheet],
       "must be 5MB or smaller"
+  end
+
+  test "progress is zero before rows are counted" do
+    assert_equal 0, UserImport.new.progress_porcentage
+  end
+
+  test "calculates progress of processed rows" do
+    user_import = UserImport.new(total_rows: 4, processed_rows: 1)
+
+    assert_equal 25, user_import.progress_porcentage
+  end
+
+  test "completed processing whn reaches 100% even with failed rows" do
+    user_import = UserImport.new(
+      total_rows: 4,
+      processed_rows: 4,
+      failed_rows: 1
+    )
+
+    assert_equal 100, user_import.progress_porcentage
+  end
+
+  test "refresh when progress changes" do
+    user_import = UserImport.new(status: :processing, total_rows: 2)
+
+    user_import.spreadsheet.attach(
+      io: StringIO.new("full_name,email\nUser,user@example.com\n"),
+      filename: "users.csv",
+      content_type: "text/csv"
+    )
+    user_import.save!
+
+    messages = capture_broadcasts(user_import.to_gid_param) do
+      user_import.update!(processed_rows: 1)
+    end
+
+    assert_equal 1, messages.size
+
+    stream = Nokogiri::HTML.fragment(messages.first).at_css("turbo-stream")
+    assert_equal "refresh", stream&.[]("action")
   end
 end
