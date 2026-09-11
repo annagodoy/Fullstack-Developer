@@ -44,8 +44,42 @@
       class: "block w-full rounded border p-2" %>
   </div>
 
+  <div>
+    <%= form.label :avatar_image, "Avatar" %>
+
+    <%= form.file_field :avatar_image,
+      accept: "image/jpeg,image/png",
+      aria: { describedby: "avatar-help" },
+      class: "mt-2 block w-full" %>
+
+    <p id="avatar-help" class="mt-1 text-sm text-gray-600">
+      Upload a new avatar.
+      JPEG or PNG, up to 5 MB.
+    </p>
+  </div>
+
   <%= form.submit "Save",
   class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
 
   <%= link_to "Cancel", admin_users_path, class: "underline" %>
+<% end %>
+
+<% if @user.persisted? && @user.avatar_image.attachment&.persisted? %>
+  <div class="mt-6 space-y-3">
+    <p class="font-medium">Current avatar</p>
+
+    <%= image_tag avatar_admin_user_path(@user),
+      alt: "Current avatar",
+      width: 96,
+      height: 96,
+      class: "h-24 w-24 rounded-full object-cover" %>
+
+    <%= button_to "Remove avatar",
+      avatar_admin_user_path(@user),
+      method: :delete,
+      form: {
+        data: { turbo_confirm: "Are you sure? This cant be undone." }
+      },
+      class: "rounded bg-red-700 px-4 py-2 text-white" %>
+  </div>
 <% end %>

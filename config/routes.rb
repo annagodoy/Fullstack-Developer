@@ -5,7 +5,12 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#show"
 
-    resources :users, except: :show
+    resources :users, except: :show do
+      member do
+        get :avatar
+        delete :avatar, action: :remove_avatar
+      end
+    end
 
     resources :user_imports, only: %i[new create show]
   end
