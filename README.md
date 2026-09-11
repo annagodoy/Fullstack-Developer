@@ -18,6 +18,7 @@ are reviewed and discussed before proceeding.
 [Turbo](https://turbo.hotwired.dev/reference/drive)
 [CodeQl](https://codeql.github.com/codeql-query-help/ruby/rb-clear-text-storage-sensitive-data/)
 [Mailcatcher](https://mailcatcher.me/)
+[Docker Compose](https://docs.docker.com/compose/how-tos/startup-order/)
 
 # Umanni User Management
 
@@ -238,24 +239,97 @@ While an import is pending or processing, the page also checks the
 status every three seconds to recover updates missed before the
 live connection was established. Checks stop after completion or failure.
 
-## Docker and CI
+## Run with Docker Compose
 
-The production Dockerfile uses multiple stages and starts Rails
-through Thruster.
+This setup runs the production image locally with PostgreSQL,
+Thruster and a separate Solid Queue worker.
+
+Requirements: Docker Engine and Docker Compose v2.
+
+### Configure local secrets
+
+Create a `.env` file in the project root:
 
 ```sh
-docker build -t umanni .
+(umask 077
+  {
+    printf 'SECRET_KEY_BASE=%s\n' "$(openssl rand -hex 64)"
+    printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 32)"
+  } > .env
+)
 ```
 
-The GitHub Actions Docker job builds the image, starts it against
-a temporary PostgreSQL 17 service and checks for HTTP 200 at `/up`.
+Run this only for the initial setup: it replaces `.env`.
+Keep these values between restarts. The file is excluded from Git
+and the Docker build context.
 
-The container entrypoint prepares the production databases before
-starting the server. The CI check supplies separate connection URLs
-for the primary, queue and cable databases.
+Docker Compose loads `.env` automatically. Native Rails commands
+do not load this file automatically.
 
-The production Docker image was built and its `/up` endpoint
-returned HTTP 200 in GitHub Actions.
+### Start the application
+
+```sh
+docker compose up --build --detach --wait --wait-timeout 180
+```
+
+Open http://localhost:8080.
+
+The web entrypoint prepares the primary, queue and cable databases.
+The worker starts after the web service becomes healthy.
+
+### Create an administrator
+
+Using zsh:
+
+```sh
+export ADMIN_FULL_NAME="Administrator"
+export ADMIN_EMAIL="admin@example.com"
+read -s "ADMIN_PASSWORD?Initial password: "
+export ADMIN_PASSWORD
+
+docker compose exec \
+  -e ADMIN_FULL_NAME \
+  -e ADMIN_EMAIL \
+  -e ADMIN_PASSWORD \
+  web bin/rails db:seed
+
+unset ADMIN_PASSWORD ADMIN_EMAIL ADMIN_FULL_NAME
+```
+
+Sign in using the supplied credentials.
+
+### Logs and shutdown
+
+```sh
+docker compose logs --follow web worker
+docker compose down
+```
+
+Named volumes preserve PostgreSQL data and uploaded files.
+Web and worker share the upload volume mounted at `/rails/storage`.
+Using `docker compose down --volumes` deletes these volumes.
+
+### Scope
+
+This Compose configuration is for local demonstration of the
+production image. It binds the application to localhost over HTTP.
+
+Email delivery is not configured by this Compose file. Use the native
+development setup with MailCatcher to demonstrate password recovery.
+
+A public deployment requires HTTPS, appropriate host configuration
+and SMTP settings supplied to both web and worker.
+
+## Docker validation in CI
+
+The Docker job builds and starts the Compose stack, then checks:
+
+- HTTP success at `/up`.
+- Registration of an active Solid Queue worker.
+- Shared upload storage between web and worker.
+
+Container logs are collected, and temporary containers and volumes
+are removed after the checks.
 
 ## Configuration notes
 
