@@ -85,6 +85,34 @@ Development uses three databases:
 
 Tests use `umanni_test`.
 
+## Create the first administrator
+
+The seed reads these environment variables:
+
+- `ADMIN_FULL_NAME`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD` — at least 12 characters.
+
+On macOS with zsh:
+
+    export ADMIN_FULL_NAME="Administrator"
+    export ADMIN_EMAIL="admin@example.com"
+    read -s "ADMIN_PASSWORD?Initial password: "
+    export ADMIN_PASSWORD
+
+    bin/rails db:seed
+
+    unset ADMIN_PASSWORD ADMIN_EMAIL ADMIN_FULL_NAME
+
+Sign in at `/session/new` using the supplied email and password.
+
+Running the seed again preserves an existing administrator's name,
+password and other account details. If the email belongs to a member,
+the seed fails without modifying that account.
+
+When all three variables are absent, administrator creation is skipped.
+Partial configuration raises an error.
+
 ## Run locally
 
 ```sh
@@ -192,7 +220,6 @@ returned HTTP 200 in GitHub Actions.
 - JSON is restricted to the 2.x series because Active Support 8.1.3.1
   passes positional options incompatible with JSON 3.
 - Credentials keys and local environment files are excluded from Git.
-- No seed data is defined yet.
 - Avatars accept JPEG and PNG files up to 5 MB.
 - Avatar downloads require authentication. 
 - Members can access their own avatar; admins can upload, view, 
