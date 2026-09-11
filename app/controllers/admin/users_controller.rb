@@ -1,5 +1,8 @@
 class Admin::UsersController < Admin::BaseController
-  before_action :set_user, only: %i[ edit update destroy]
+  before_action :set_user, only: %i[
+    edit update destroy avatar remove_avatar
+  ]
+
   before_action :set_page, only: :index
 
   PAGE_SIZE = 25
@@ -53,6 +56,26 @@ class Admin::UsersController < Admin::BaseController
     status: :see_other
   end
 
+  def avatar
+    image = @user.avatar_image
+    return head :not_found unless image.attached?
+
+    response.headers["Cache-Control"] = "private, no-store"
+
+    send_data image.download,
+      type: image.content_type,
+      disposition: "inline",
+      filename: image.filename.to_s
+  end
+
+  def remove_avatar
+    @user.avatar_image.purge
+
+    redirect_to edit_admin_user_path(@user),
+      notice: "Avatar removed.",
+      status: :see_other
+  end
+
   private
 
   def records
@@ -81,6 +104,7 @@ class Admin::UsersController < Admin::BaseController
         email
         password
         role
+        avatar_image
       ]
     )
   end
@@ -91,6 +115,7 @@ class Admin::UsersController < Admin::BaseController
         full_name
         email
         role
+        avatar_image
       ]
     )
   end

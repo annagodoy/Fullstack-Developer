@@ -182,8 +182,10 @@ returned HTTP 200 in GitHub Actions.
 - Credentials keys and local environment files are excluded from Git.
 - No seed data is defined yet.
 - Avatars accept JPEG and PNG files up to 5 MB.
-- Avatar downloads require authentication and serve only the current
-  user's file. Default Active Storage routes are disabled.
+- Avatar downloads require authentication. 
+- Members can access their own avatar; admins can upload, view, 
+  replace and remove avatars through the dashboard.
+- Default Active Storage routes are disabled.
 - Files are stored locally. Production deployments must persist
   `/rails/storage` or configure an external storage service.
 - Existing users must have their full names populated before applying
