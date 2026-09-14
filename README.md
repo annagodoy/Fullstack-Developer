@@ -10,7 +10,7 @@ are reviewed and discussed before proceeding.
 ### Consulted Documentation
 [Active Storage Overview](https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers)
 [Active Record Callbacks](https://guides.rubyonrails.org/active_record_callbacks.html#aliases-for-after-commit)
-[Classic to Zeitwer](https://edgeguides.rubyonrails.org/classic_to_zeitwerk_howto.html)
+[Classic to Zeitwerk](https://edgeguides.rubyonrails.org/classic_to_zeitwerk_howto.html)
 [Solid Queue](https://github.com/rails/solid_queue#concurrency-controls)
 [SimpleCov](https://github.com/simplecov-ruby/simplecov?tab=readme-ov-file)
 [GitHub Artifacts](https://docs.github.com/en/actions/tutorials/store-and-share-data)
@@ -44,8 +44,11 @@ administrative user management and automatic import progress updates.
 A narrow-screen test checks administrative navigation and horizontal
 page overflow. Tests run with Selenium and headless Chrome.
 
-Final delivery documentation and production setup verification
-are still pending.
+GitHub Actions validates the production image through Docker Compose,
+including the health endpoint, an active Solid Queue worker and shared
+upload storage.
+
+Public deployment and external SMTP delivery have not been verified.
 
 ## Stack
 
@@ -139,8 +142,10 @@ bin/bundler-audit
 bin/importmap audit
 ```
 
-The test suite covers authentication, password reset, session
-revocation and user validations.
+The test suite covers authentication, password reset, authorization,
+profile and administrative user management, avatars, spreadsheet
+imports and administrator seeds. Browser tests exercise the main
+user flows and narrow-screen layout.
 
 Line coverage is measured with SimpleCov, including merged results
 from parallel test workers. The CI test job requires at least 90%
